@@ -1,9 +1,23 @@
 [
   {
-    "Id": "b97a092e-98f2-4668-b613-a105a3078c33",
-    "Description": "Hola mundo",
-    "Estado": "Alta",
-    "Prioridad" : "3",
-    "Tiempo": "3"
+    "Id": "4a14eba2-f515-4107-91e4-e7d8dee565aa",
+    "Descripcion": "Limpiar",
+    "Estado": "Pendiente",
+    "Prioridad": "alta",
+    "TiempoHoras": 1
+  },
+  {
+    "Id": "2f67e181-427e-4e77-9d97-386f2308ead8",
+    "Descripcion": "Ordenar",
+    "Estado": "Hecho",
+    "Prioridad": "baja",
+    "TiempoHoras": 2
+  },
+  {
+    "Id": "851d350e-b0af-41ab-a210-b6808536c755",
+    "Descripcion": "Probando",
+    "Estado": "Listo",
+    "Prioridad": "Baja",
+    "TiempoHoras": 2
   }
 ]

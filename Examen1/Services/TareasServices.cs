@@ -2,6 +2,7 @@
 using Examen1.Database.Entities;
 using Examen1.Services.interfaces;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Examen1.Services
 {
@@ -28,29 +29,29 @@ namespace Examen1.Services
 
         public async Task<bool> CreateAsync(TareaCreateDto dto)
         {
-            var tareasdtos = await ReadTareaFromFileAsync();
+            var tareas = await ReadTareaFromFileAsync(); // Leer las tareas actuales desde el archivo JSON
 
-            var tareadto = new TareaDto
+            var nuevaTarea = new TareaDto
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Generar un nuevo Id único para la nueva tarea
                 Descripcion = dto.Descripcion,
                 Estado = dto.Estado,
                 Prioridad = dto.Prioridad,
                 TiempoHoras = dto.TiempoHoras,
             };
 
-            tareasdtos.Add(tareadto);
+            tareas.Add(nuevaTarea);  // Agregar la nueva tarea a la lista de tareas
 
-            var tareas = tareasdtos.Select(x => new TareaEntity
+            var tareasEntities = tareas.Select(x => new TareaEntity
             {
-                Id = Guid.NewGuid(),
-                Descripcion = dto.Descripcion,
-                Estado = dto.Estado,
-                Prioridad = dto.Prioridad,
-                TiempoHoras = dto.TiempoHoras,
+                Id = x.Id,
+                Descripcion = x.Descripcion,
+                Estado = x.Estado,
+                Prioridad = x.Prioridad,
+                TiempoHoras = x.TiempoHoras,
             }).ToList();
 
-            await WriteTareaToFileAsync(tareas);
+            await WriteTareaToFileAsync(tareasEntities);  // Escribir las tareas actualizadas de vuelta al archivo JSON
 
             return true;
         }
@@ -145,6 +146,48 @@ namespace Examen1.Services
             var json = JsonConvert.SerializeObject(tareas, Newtonsoft.Json.Formatting.Indented);
 
             await File.WriteAllTextAsync(_JSON_FILE, json);
+        }
+
+        public async Task<bool> ActualizarEstadoAsync(Guid id, string nuevoEstado)
+        {
+            var tareasdtos = await ReadTareaFromFileAsync();
+
+            var tarea = tareasdtos.FirstOrDefault(t => t.Id == id);
+
+            if (tarea == null)
+            {
+                return false; // Tarea no encontrada
+            }
+
+            tarea.Estado = nuevoEstado; // Actualizar solo el estado de la tarea
+
+            // Convertir a entidades (si es necesario)
+            var tareasEntities = tareasdtos.Select(t => new TareaEntity
+            {
+                Id = t.Id,
+                Descripcion = t.Descripcion,
+                Estado = t.Estado,
+                Prioridad = t.Prioridad,
+                TiempoHoras = t.TiempoHoras,
+            }).ToList();
+
+            await WriteTareaToFileAsync(tareasEntities); // Guardar los cambios en el archivo JSON
+
+            return true;
+        }
+
+
+        public async Task<int> CalcularTiempoTotalEstimadoAsync()
+        {
+            var tareasdtos = await ReadTareaFromFileAsync();
+
+            // Filtrar las tareas pendientes
+            var tareasPendientes = tareasdtos.Where(t => t.Estado.ToLower() == "pendiente").ToList();
+
+            // Calcular la suma del tiempo estimado
+            int tiempoTotalEstimado = tareasPendientes.Sum(t => t.TiempoHoras);
+
+            return tiempoTotalEstimado;
         }
 
     }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Examen1.Dtos.TareasDto;
 using Examen1.Database.Entities;
+using Examen1.Services;
 
 
 namespace Examen1.Controllers
@@ -16,6 +17,7 @@ namespace Examen1.Controllers
         {
             this._tareasServices = tareasServices;
         }
+
 
 
         [HttpGet]
@@ -76,6 +78,21 @@ namespace Examen1.Controllers
             await _tareasServices.DeleteAsync(id);
 
             return Ok();
+        }
+
+
+        [HttpGet("tiempo-total-pendientes")]
+        public async Task<ActionResult<int>> CalcularTiempoTotalPendientes()
+        {
+            try
+            {
+                var tiempoTotalEstimado = await _tareasServices.CalcularTiempoTotalEstimadoAsync();
+                return Ok(tiempoTotalEstimado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al calcular el tiempo total estimado de tareas pendientes: {ex.Message}");
+            }
         }
     }
 }

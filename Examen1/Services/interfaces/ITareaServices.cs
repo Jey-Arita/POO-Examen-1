@@ -9,5 +9,9 @@ namespace Examen1.Services.interfaces
         Task<bool> CreateAsync(TareaCreateDto dto);
         Task<bool> EditAsync(TareaEditDto dto, Guid id);
         Task<bool> DeleteAsync(Guid id);
+        Task<bool> ActualizarEstadoAsync(Guid id, string dto);
+
+        Task<int> CalcularTiempoTotalEstimadoAsync();
+
     }
 }
